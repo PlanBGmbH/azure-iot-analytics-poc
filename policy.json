@@ -11,6 +11,7 @@
         "agwLogPolicyName": "policy-agw-diagnostic-settings-markusm",
         "nsgLogPolicyName": "policy-nsg-diagnostic-settings-markusm",
         "iotLogPolicyName": "policy-iot-diagnostic-settings-markusm",
+        "asaLogPolicyName": "policy-asa-diagnostic-settings-markusm",
         "diagnosticSettingsInitiativeName": "resource-diagnostic-settings-policySet-markusm",
         "policyParameters": {
             "effect": {
@@ -1105,16 +1106,15 @@
             }
 
         },
-
         {
-            "name": "[variables('iotLogPolicyName')]",
+            "name": "[variables('asaLogPolicyName')]",
             "type": "Microsoft.Authorization/policyDefinitions",
             "apiVersion": "2019-09-01",
             "properties": {
-                "displayName": "MarkusMeyer - Deploy Diagnostic Settings for IoT Hub to Log Analytics workspace",
+                "displayName": "MarkusMeyer - Deploy Diagnostic Settings for Azure Stream Analytics to Log Analytics workspace",
                 "policyType": "Custom",
                 "mode": "All",
-                "description": "Deploys the diagnostic settings for IoT Hub to stream to a regional Log Analytics workspace when any Network Security Groups which is missing this diagnostic settings is created or updated.",
+                "description": "Deploys the diagnostic settings for Azure Stream Analytics to stream to a regional Log Analytics workspace when any Network Security Groups which is missing this diagnostic settings is created or updated.",
                 "metadata": {
                     "version": "1.0.0",
                     "category": "Monitoring"
@@ -1123,7 +1123,7 @@
                 "policyRule": {
                     "if": {
                         "field": "type",
-                        "equals": "Microsoft.Network/networkSecurityGroups"
+                        "equals": "Microsoft.StreamAnalytics/streamingjobs"
                     },
                     "then": {
                         "effect": "[[parameters('effect')]",
@@ -1185,7 +1185,144 @@
                                         "variables": {},
                                         "resources": [
                                             {
-                                                "type": "Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings",
+                                                "type": "Microsoft.StreamAnalytics/streamingjobs/providers/diagnosticSettings",
+                                                "apiVersion": "2019-09-01",
+                                                "name": "[[concat(parameters('resourceName'), '/', 'Microsoft.Insights/', parameters('profileName'))]",
+                                                "location": "[[parameters('location')]",
+                                                "dependsOn": [],
+                                                "properties": {
+                                                    "workspaceId": "[[parameters('logAnalytics')]",
+                                                    "storageAccountId": "[[parameters('archiveStorage')]",
+                                                    "metrics": [],
+                                                    "logs": [
+                                                        {
+                                                            "category": "Execution",
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "category": "Authoring",
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "outputs": {}
+                                    },
+                                    "parameters": {
+                                        "location": {
+                                            "value": "[[field('location')]"
+                                        },
+                                        "resourceName": {
+                                            "value": "[[field('name')]"
+                                        },
+                                        "logAnalytics": {
+                                            "value": "[[parameters('logAnalytics')]"
+                                        },
+                                        "archiveStorage": {
+                                            "value": "[[parameters('archiveStorage')]"
+                                        },
+                                        "metricsEnabled": {
+                                            "value": "[[parameters('metricsEnabled')]"
+                                        },
+                                        "logsEnabled": {
+                                            "value": "[[parameters('logsEnabled')]"
+                                        },
+                                        "storageExists": {
+                                            "value": "[[parameters('storageExists')]"
+                                        },
+                                        "profileName": {
+                                            "value": "[[parameters('profileName')]"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        },
+        {
+            "name": "[variables('iotLogPolicyName')]",
+            "type": "Microsoft.Authorization/policyDefinitions",
+            "apiVersion": "2019-09-01",
+            "properties": {
+                "displayName": "MarkusMeyer - Deploy Diagnostic Settings for IoT Hub to Log Analytics workspace",
+                "policyType": "Custom",
+                "mode": "All",
+                "description": "Deploys the diagnostic settings for IoT Hub to stream to a regional Log Analytics workspace when any Network Security Groups which is missing this diagnostic settings is created or updated.",
+                "metadata": {
+                    "version": "1.0.0",
+                    "category": "Monitoring"
+                },
+                "parameters": "[variables('policyParameters')]",
+                "policyRule": {
+                    "if": {
+                        "field": "type",
+                        "equals": "Microsoft.Devices/IotHubs"
+                    },
+                    "then": {
+                        "effect": "[[parameters('effect')]",
+                        "details": {
+                            "type": "Microsoft.Insights/diagnosticSettings",
+                            "name": "[[parameters('profileName')]",
+                            "existenceCondition": {
+                                "allOf": [
+                                    {
+                                        "field": "Microsoft.Insights/diagnosticSettings/logs.enabled",
+                                        "equals": "[[parameters('logsEnabled')]"
+                                    },
+                                    {
+                                        "field": "Microsoft.Insights/diagnosticSettings/metrics.enabled",
+                                        "equals": "[[parameters('metricsEnabled')]"
+                                    },
+                                    {
+                                        "field": "Microsoft.Insights/diagnosticSettings/storageAccountId",
+                                        "equals": "[[parameters('storageExists')]"
+                                    }
+                                ]
+                            },
+                            "roleDefinitionIds": [
+                                "/providers/microsoft.authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa",
+                                "/providers/microsoft.authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293"
+                            ],
+                            "deployment": {
+                                "properties": {
+                                    "mode": "incremental",
+                                    "template": {
+                                        "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                                        "contentVersion": "1.0.0.0",
+                                        "parameters": {
+                                            "resourceName": {
+                                                "type": "string"
+                                            },
+                                            "location": {
+                                                "type": "string"
+                                            },
+                                            "logAnalytics": {
+                                                "type": "string"
+                                            },
+                                            "archiveStorage": {
+                                                "type": "string"
+                                            },
+                                            "metricsEnabled": {
+                                                "type": "string"
+                                            },
+                                            "logsEnabled": {
+                                                "type": "string"
+                                            },
+                                            "storageExists": {
+                                                "type": "string"
+                                            },
+                                            "profileName": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "variables": {},
+                                        "resources": [
+                                            {
+                                                "type": "Microsoft.Devices/IotHubs/providers/diagnosticSettings",
                                                 "apiVersion": "2019-09-01",
                                                 "name": "[[concat(parameters('resourceName'), '/', 'Microsoft.Insights/', parameters('profileName'))]",
                                                 "location": "[[parameters('location')]",
