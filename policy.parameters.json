@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "profileName": {
+            "value": "MarkusMeyer-setbypolicy_logAnalytics"
+        },
+        "logAnalytics": {
+            "value": "DefaultWorkspace-e687f850-b05f-4061-8ccc-e950cca41423-WEU"
+        },
+        "archiveStorage": {
+            "value": "stevalmm"
+        },
+        "metricsEnabled": {
+            "value": "True"
+        },
+        "logsEnabled": {
+            "value": "True"
+        },
+        "storageExists": {
+            "value": "True"
+        },
+        "effect": {
+            "value": "DeployIfNotExists"
+        }
+    }
+}
