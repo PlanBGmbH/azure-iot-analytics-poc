@@ -143,10 +143,63 @@ resource event_hub 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
   name: concat(event_hub_namespace.name, '/', event_hub_name)
   properties: {
     partitionCount: 1
-    messageRetentionInDays: 7
+    messageRetentionInDays: 1
   }
 }
 output eventHubId string = event_hub.id
+
+param event_hub_adedirectdigitallab_name string = 'adedirectdigitallab'
+resource event_hub_adedirectdigitallab 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
+  name: concat(event_hub_namespace.name, '/', event_hub_adedirectdigitallab_name)
+  properties: {
+    partitionCount: 1
+    messageRetentionInDays: 1
+  }
+}
+output eventHubIdAdedirectdigitallab string = event_hub_adedirectdigitallab.id
+
+
+param event_hub_aintestingdirect1016247_name string = 'aintestingdirect1016247'
+resource event_hub_aintestingdirect1016247 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
+  name: concat(event_hub_namespace.name, '/', event_hub_aintestingdirect1016247_name)
+  properties: {
+    partitionCount: 1
+    messageRetentionInDays: 1
+  }
+}
+output eventHubIdAintestingdirect1016247 string = event_hub_aintestingdirect1016247.id
+
+param event_hub_asaenrich2routingapp_name string = 'asaenrich2routingapp'
+resource event_hub_asaenrich2routingapp 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
+  name: concat(event_hub_namespace.name, '/', event_hub_asaenrich2routingapp_name)
+  properties: {
+    partitionCount: 1
+    messageRetentionInDays: 1
+  }
+}
+output eventHubIdAsaenrich2routingapp string = event_hub_asaenrich2routingapp.id
+
+
+param event_hub_iothub2asadigitallab_name string = 'iothub2asadigitallab'
+resource event_hub_iothub2asadigitallab 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
+  name: concat(event_hub_namespace.name, '/', event_hub_iothub2asadigitallab_name)
+  properties: {
+    partitionCount: 1
+    messageRetentionInDays: 1
+  }
+}
+output eventHubIdIothub2asadigitallab string = event_hub_iothub2asadigitallab.id
+
+
+param event_hub_iothub2asaenrichmessage_name string = 'iothub2asaenrichmessage'
+resource event_hub_iothub2asaenrichmessage 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
+  name: concat(event_hub_namespace.name, '/', event_hub_iothub2asaenrichmessage_name)
+  properties: {
+    partitionCount: 1
+    messageRetentionInDays: 1
+  }
+}
+output eventHubIdIothub2asaenrichmessage string = event_hub_iothub2asaenrichmessage.id
 
 param storage_account_name string = 'str${uniqueString(resourceGroup().id)}'
 resource storage_account 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
