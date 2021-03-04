@@ -20,4 +20,5 @@ echo "$connection_string"
 echo
 
 
-az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name S1 --endpoint-type azurestoragecontainer --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $connection_string --container-name input-iot-hub --batch-frequency 100 --chunk-size 100 --ff {iothub}-{partition}-{YYYY}-{MM}-{DD}-{HH}-{mm}
+az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name blobRawMeasureData --endpoint-type azurestoragecontainer --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $connection_string --container-name iothubrawdata --batch-frequency 60 --chunk-size 100 --ff {iothub}/{partition}/{YYYY}/{MM}/{DD}/{HH}/{mm} --encoding json
+az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name twinchanges2blob --endpoint-type azurestoragecontainer --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $connection_string --container-name iothubtwinchanges --batch-frequency 60 --chunk-size 100 --ff {iothub}/{YYYY}/{MM}/{DD}/{HH}/{mm}/{partition} --encoding json
