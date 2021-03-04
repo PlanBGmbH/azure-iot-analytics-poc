@@ -159,6 +159,11 @@ resource storage_account 'Microsoft.Storage/storageAccounts@2020-08-01-preview' 
 }
 output storageId string = storage_account.id
 
+param storage_account_blob_container_name string = 'input-iot-hub'
+resource storage_account_blob_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2020-08-01-preview' ={
+name: '${storage_account.name}/default/${storage_account_blob_container_name}'
+}
+
 param iot_hub_name string = 'iot-${uniqueString(resourceGroup().id)}'
 resource iothub 'Microsoft.Devices/IotHubs@2020-04-01' = {
   name: iot_hub_name
