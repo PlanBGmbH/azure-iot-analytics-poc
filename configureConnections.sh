@@ -5,12 +5,16 @@ iot_hub_id=$3
 subscription_id=$4
 event_hub_namespace_id=$5
 event_hub_id=$6
+event_hub_id_adedirectdigitallab=$7
+event_hub_id_aintestingdirect1016247=$8
 echo $resource_group_name
 echo $storage_account_id
 echo $iot_hub_id
 echo $subscription_id
 echo $event_hub_namespace_id
 echo $event_hub_id
+echo $event_hub_id_adedirectdigitallab
+echo $event_hub_id_aintestingdirect1016247
 
 # az storage account show-connection-string  --resource-group $resource_group_name -n $storage_account_id
 
@@ -31,6 +35,17 @@ echo
 eventhub_authorization_rule_name=$(az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id --query "[].name" --output tsv)
 eventhub_authorization_rule_name=$(echo "$eventhub_authorization_rule_name" | tr -d '\r')
 echo "eventhub_authorization_rule_name:" $eventhub_authorization_rule_name
+echo
+
+eventhub_authorization_rule_name_adedirectdigitallab=$(az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id_adedirectdigitallab --query "[].name" --output tsv)
+eventhub_authorization_rule_name_adedirectdigitallab=$(echo "$eventhub_authorization_rule_name_adedirectdigitallab" | tr -d '\r')
+echo "eventhub_authorization_rule_name_adedirectdigitallab:" $eventhub_authorization_rule_name_adedirectdigitallab
+echo
+
+eventhub_authorization_rule_name_aintestingdirect1016247=$(az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id_aintestingdirect1016247 --query "[].name" --output tsv)
+eventhub_authorization_rule_name_aintestingdirect1016247=$(echo "$eventhub_authorization_rule_name_aintestingdirect1016247" | tr -d '\r')
+echo "eventhub_authorization_rule_name_aintestingdirect1016247:" $eventhub_authorization_rule_name_aintestingdirect1016247
+echo
 
 # az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id --query "[].name" --output tsv
 

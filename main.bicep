@@ -158,6 +158,16 @@ resource event_hub_adedirectdigitallab 'Microsoft.EventHub/namespaces/eventhubs@
 }
 output eventHubIdAdedirectdigitallab string = event_hub_adedirectdigitallab.id
 
+resource event_hub_adedirectdigitallab_auth_rule 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2017-04-01' = {
+  name: concat( event_hub_adedirectdigitallab.name, '/', event_hub_adedirectdigitallab_name, '-policy')
+  properties: {
+    rights: [
+      'Send'
+      'Listen'
+    ]
+  }
+}
+
 
 param event_hub_aintestingdirect1016247_name string = 'aintestingdirect1016247'
 resource event_hub_aintestingdirect1016247 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
@@ -179,7 +189,6 @@ resource event_hub_asaenrich2routingapp 'Microsoft.EventHub/namespaces/eventhubs
 }
 output eventHubIdAsaenrich2routingapp string = event_hub_asaenrich2routingapp.id
 
-
 param event_hub_iothub2asadigitallab_name string = 'iothub2asadigitallab'
 resource event_hub_iothub2asadigitallab 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
   name: concat(event_hub_namespace.name, '/', event_hub_iothub2asadigitallab_name)
@@ -190,7 +199,6 @@ resource event_hub_iothub2asadigitallab 'Microsoft.EventHub/namespaces/eventhubs
 }
 output eventHubIdIothub2asadigitallab string = event_hub_iothub2asadigitallab.id
 
-
 param event_hub_iothub2asaenrichmessage_name string = 'iothub2asaenrichmessage'
 resource event_hub_iothub2asaenrichmessage 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
   name: concat(event_hub_namespace.name, '/', event_hub_iothub2asaenrichmessage_name)
@@ -200,6 +208,15 @@ resource event_hub_iothub2asaenrichmessage 'Microsoft.EventHub/namespaces/eventh
   }
 }
 output eventHubIdIothub2asaenrichmessage string = event_hub_iothub2asaenrichmessage.id
+resource event_hub_iothub2asaenrichmessage_auth_rule 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2017-04-01' = {
+  name: concat( event_hub_iothub2asaenrichmessage.name, '/', event_hub_iothub2asaenrichmessage_name, '-policy')
+  properties: {
+    rights: [
+      'Send'
+      'Listen'
+    ]
+  }
+}
 
 param storage_account_name string = 'str${uniqueString(resourceGroup().id)}'
 resource storage_account 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
@@ -213,15 +230,14 @@ resource storage_account 'Microsoft.Storage/storageAccounts@2020-08-01-preview' 
 output storageId string = storage_account.id
 
 param storage_account_blob_container_name_rawdata string = 'iothubrawdata'
-resource storage_account_blob_container_rawdata 'Microsoft.Storage/storageAccounts/blobServices/containers@2020-08-01-preview' ={
-name: '${storage_account.name}/default/${storage_account_blob_container_name_rawdata}'
+resource storage_account_blob_container_rawdata 'Microsoft.Storage/storageAccounts/blobServices/containers@2020-08-01-preview' = {
+  name: '${storage_account.name}/default/${storage_account_blob_container_name_rawdata}'
 }
 
 param storage_account_blob_container_name_twinchanges string = 'iothubtwinchanges'
-resource storage_account_blob_container_twinchanges 'Microsoft.Storage/storageAccounts/blobServices/containers@2020-08-01-preview' ={
-name: '${storage_account.name}/default/${storage_account_blob_container_name_twinchanges}'
+resource storage_account_blob_container_twinchanges 'Microsoft.Storage/storageAccounts/blobServices/containers@2020-08-01-preview' = {
+  name: '${storage_account.name}/default/${storage_account_blob_container_name_twinchanges}'
 }
-
 
 param iot_hub_name string = 'iot-${uniqueString(resourceGroup().id)}'
 resource iothub 'Microsoft.Devices/IotHubs@2020-04-01' = {
