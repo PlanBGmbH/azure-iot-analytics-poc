@@ -1,18 +1,91 @@
-param storage_account_name string = 'str${uniqueString(resourceGroup().id)}'
-param iot_hub_name string = 'iot-${uniqueString(resourceGroup().id)}'
-param iot_hub_provisioning_service_name string = 'iot-ps-${uniqueString(resourceGroup().id)}'
 param location string = resourceGroup().location
+param diagnostic_settings_name string = 'diagsettings'
 
+param log_analytics_name string = 'log-${uniqueString(resourceGroup().id)}'
+resource log_analytics 'Microsoft.OperationalInsights/workspaces@2020-10-01' = {
+  name: log_analytics_name
+  location: location
+  properties: {
+    sku: {
+      name: 'Free'
+    }
+  }
+}
 param appinsights_name string = 'appi-${uniqueString(resourceGroup().id)}'
-resource appinsights 'Microsoft.Insights/components@2018-05-01-preview' = {
+resource appinsights 'Microsoft.Insights/components@2020-02-02-preview' = {
   location: location
   name: appinsights_name
   kind: 'web'
   properties: {
     Application_Type: 'web'
+    WorkspaceResourceId: log_analytics.id
   }
 }
 
+param event_hub_namespace_name string = 'evhns-${uniqueString(resourceGroup().id)}'
+resource event_hub_namespace 'Microsoft.EventHub/namespaces@2018-01-01-preview' = {
+  name: event_hub_namespace_name
+  location: location
+  sku: {
+    name: 'Standard'
+    tier: 'Standard'
+  }
+}
+
+param event_hub_name string = 'evh-${uniqueString(resourceGroup().id)}'
+resource event_hub 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
+  name: concat(event_hub_namespace.name, '/', event_hub_name)
+  properties: {
+    partitionCount: 1
+    messageRetentionInDays: 7
+  }
+}
+resource event_hub_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: diagnostic_settings_name
+  scope: event_hub
+  properties: {
+    workspaceId: log_analytics.id
+    logAnalyticsDestinationType: 'Dedicated'
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    logs: [
+      {
+        category: 'ArchiveLogs'
+        enabled: true
+      }
+      {
+        category: 'OperationalLogs'
+        enabled: true
+      }
+      {
+        category: 'AutoScaleLogs'
+        enabled: true
+      }
+      {
+        category: 'KafkaCoordinatorLogs'
+        enabled: true
+      }
+      {
+        category: 'KafkaUserErrorLogs'
+        enabled: true
+      }
+      {
+        category: 'EventHubVNetConnectionEvent'
+        enabled: true
+      }
+      {
+        category: 'CustomerManagedKeyUserLogs'
+        enabled: true
+      }
+    ]
+  }
+}
+
+param storage_account_name string = 'str${uniqueString(resourceGroup().id)}'
 resource storage_account 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
   name: storage_account_name
   location: location
@@ -22,29 +95,129 @@ resource storage_account 'Microsoft.Storage/storageAccounts@2020-08-01-preview' 
   }
 }
 
+param iot_hub_name string = 'iot-${uniqueString(resourceGroup().id)}'
 resource iothub 'Microsoft.Devices/IotHubs@2020-04-01' = {
   name: iot_hub_name
   location: location
   sku: {
-      name: 'S1'
-      capacity: 1
+    name: 'S1'
+    capacity: 1
   }
 }
 
-resource iotps 'Microsoft.Devices/provisioningServices@2020-01-01' = {
-    name: iot_hub_provisioning_service_name
-    location: location
-    sku: {
-        name: 'S1'
-        capacity: 1
-    }
+resource iot_hub_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: diagnostic_settings_name
+  scope: iothub
+  properties: {
+    workspaceId: log_analytics.id
+    logAnalyticsDestinationType: 'Dedicated'
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    logs: [
+      {
+        category: 'Connections'
+        enabled: true
+      }
+      {
+        category: 'DeviceTelemetry'
+        enabled: true
+      }
+      {
+        category: 'C2DCommands'
+        enabled: true
+      }
+      {
+        category: 'DeviceIdentityOperations'
+        enabled: true
+      }
+      {
+        category: 'FileUploadOperations'
+        enabled: true
+      }
+      {
+        category: 'Routes'
+        enabled: true
+      }
+      {
+        category: 'D2CTwinOperations'
+        enabled: true
+      }
+      {
+        category: 'C2DTwinOperations'
+        enabled: true
+      }
+      {
+        category: 'TwinQueries'
+        enabled: true
+      }
+      {
+        category: 'JobsOperations'
+        enabled: true
+      }
+      {
+        category: 'DirectMethods'
+        enabled: true
+      }
+      {
+        category: 'DistributedTracing'
+        enabled: true
+      }
+      {
+        category: 'Configurations'
+        enabled: true
+      }
+      {
+        category: 'DeviceStreams'
+        enabled: true
+      }
+    ]
+  }
+}
 
-    properties: {
-        iotHubs: [
-            {
-                connectionString: 'HostName=${iothub.name}.azure-devices.net;SharedAccessKeyName=${listKeys(iothub.id, '2020-04-01').value[0].keyName};SharedAccessKey=${listKeys(iothub.id, '2020-04-01').value[0].primaryKey}'
-                location: location
-            }
-        ]
-    }
+param iot_hub_provisioning_service_name string = 'iot-ps-${uniqueString(resourceGroup().id)}'
+resource iotps 'Microsoft.Devices/provisioningServices@2020-01-01' = {
+  name: iot_hub_provisioning_service_name
+  location: location
+  sku: {
+    name: 'S1'
+    capacity: 1
+  }
+
+  properties: {
+    iotHubs: [
+      {
+        connectionString: 'HostName=${iothub.name}.azure-devices.net;SharedAccessKeyName=${listKeys(iothub.id, '2020-04-01').value[0].keyName};SharedAccessKey=${listKeys(iothub.id, '2020-04-01').value[0].primaryKey}'
+        location: location
+      }
+    ]
+  }
+}
+
+resource iotps_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: diagnostic_settings_name
+  scope: iotps
+  properties: {
+    workspaceId: log_analytics.id
+    logAnalyticsDestinationType: 'Dedicated'
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    logs: [
+      {
+        category: 'DeviceOperations'
+        enabled: true
+      }
+      {
+        category: 'ServiceOperations'
+        enabled: true
+      }
+    ]
+  }
 }
