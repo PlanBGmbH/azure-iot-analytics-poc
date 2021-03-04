@@ -11,3 +11,6 @@ A proof of concept for linking diagnostic settings with application insights in 
 
 
 ```
+## IoT Hub Tutorial
+
+[https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-dotnet](https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-dotnet)
