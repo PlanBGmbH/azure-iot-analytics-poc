@@ -91,6 +91,7 @@ resource event_hub_namespace 'Microsoft.EventHub/namespaces@2018-01-01-preview' 
     tier: 'Standard'
   }
 }
+output eventHubNamespaceId string = event_hub_namespace.id
 
 resource event_hub_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
   name: diagnostic_settings_name
@@ -145,6 +146,7 @@ resource event_hub 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
     messageRetentionInDays: 7
   }
 }
+output eventHubId string = event_hub.id
 
 param storage_account_name string = 'str${uniqueString(resourceGroup().id)}'
 resource storage_account 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
@@ -155,6 +157,7 @@ resource storage_account 'Microsoft.Storage/storageAccounts@2020-08-01-preview' 
     name: 'Standard_LRS'
   }
 }
+output storageId string = storage_account.id
 
 param iot_hub_name string = 'iot-${uniqueString(resourceGroup().id)}'
 resource iothub 'Microsoft.Devices/IotHubs@2020-04-01' = {
@@ -165,6 +168,7 @@ resource iothub 'Microsoft.Devices/IotHubs@2020-04-01' = {
     capacity: 1
   }
 }
+output iothubId string = iothub.id
 
 resource iot_hub_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
   name: diagnostic_settings_name
