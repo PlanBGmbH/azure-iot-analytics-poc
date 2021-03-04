@@ -5,7 +5,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 namespace IoTDevice
 {
     class Program
@@ -14,10 +15,13 @@ namespace IoTDevice
         private static readonly TransportType _transportType = TransportType.Mqtt;
         private static string _connectionString = string.Empty;
 
-
         private static async Task Main(string[] args)
         {
-            Console.WriteLine("IoT Hub Quickstarts #1 - Simulated device.");
+            Console.WriteLine("Starting Simulated device.");
+
+            using IHost host = CreateHostBuilder(args).Build();
+            // Application code should start here.
+
 
             // Connect to the IoT hub using the MQTT protocol
             _deviceClient = DeviceClient.CreateFromConnectionString(_connectionString, _transportType);
@@ -37,7 +41,25 @@ namespace IoTDevice
 
             _deviceClient.Dispose();
             Console.WriteLine("Device simulator finished.");
+            await host.RunAsync();
+
         }
+
+        static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((hostingContext, configuration) =>
+            {
+                configuration.Sources.Clear();
+
+                IHostEnvironment env = hostingContext.HostingEnvironment;
+
+                configuration
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
+
+                IConfigurationRoot configurationRoot = configuration.Build();
+                _connectionString = configurationRoot.GetValue<string>("IoTHubConnectionString");
+            });
 
         private static async Task SendDeviceToCloudMessagesAsync(CancellationToken ct)
         {
@@ -69,10 +91,10 @@ namespace IoTDevice
                 message.Properties.Add("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
 
                 // Send the telemetry message
-                await _deviceClient.SendEventAsync(message);
+                await _deviceClient.SendEventAsync(message, ct);
                 Console.WriteLine($"{DateTime.Now} > Sending message: {messageBody}");
 
-                await Task.Delay(1000);
+                await Task.Delay(1000, ct);
             }
         }
     }
