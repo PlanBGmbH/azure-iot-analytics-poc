@@ -21,6 +21,66 @@ resource appinsights 'Microsoft.Insights/components@2020-02-02-preview' = {
     WorkspaceResourceId: log_analytics.id
   }
 }
+resource appinsights_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: diagnostic_settings_name
+  scope: appinsights
+  properties: {
+    workspaceId: log_analytics.id
+    logAnalyticsDestinationType: 'Dedicated'
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    logs: [
+      {
+        category: 'AppAvailabilityResults'
+        enabled: true
+      }
+      {
+        category: 'AppBrowserTimings'
+        enabled: true
+      }
+      {
+        category: 'AppEvents'
+        enabled: true
+      }
+      {
+        category: 'AppMetrics'
+        enabled: true
+      }
+      {
+        category: 'AppDependencies'
+        enabled: true
+      }
+      {
+        category: 'AppExceptions'
+        enabled: true
+      }
+      {
+        category: 'AppPageViews'
+        enabled: true
+      }
+      {
+        category: 'AppPerformanceCounters'
+        enabled: true
+      }
+      {
+        category: 'AppRequests'
+        enabled: true
+      }
+      {
+        category: 'AppSystemEvents'
+        enabled: true
+      }
+      {
+        category: 'AppTraces'
+        enabled: true
+      }
+    ]
+  }
+}
 
 param event_hub_namespace_name string = 'evhns-${uniqueString(resourceGroup().id)}'
 resource event_hub_namespace 'Microsoft.EventHub/namespaces@2018-01-01-preview' = {
@@ -32,17 +92,9 @@ resource event_hub_namespace 'Microsoft.EventHub/namespaces@2018-01-01-preview' 
   }
 }
 
-param event_hub_name string = 'evh-${uniqueString(resourceGroup().id)}'
-resource event_hub 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
-  name: concat(event_hub_namespace.name, '/', event_hub_name)
-  properties: {
-    partitionCount: 1
-    messageRetentionInDays: 7
-  }
-}
 resource event_hub_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
   name: diagnostic_settings_name
-  scope: event_hub
+  scope: event_hub_namespace
   properties: {
     workspaceId: log_analytics.id
     logAnalyticsDestinationType: 'Dedicated'
@@ -82,6 +134,15 @@ resource event_hub_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01
         enabled: true
       }
     ]
+  }
+}
+
+param event_hub_name string = 'evh-${uniqueString(resourceGroup().id)}'
+resource event_hub 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
+  name: concat(event_hub_namespace.name, '/', event_hub_name)
+  properties: {
+    partitionCount: 1
+    messageRetentionInDays: 7
   }
 }
 
@@ -216,6 +277,42 @@ resource iotps_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-pre
       }
       {
         category: 'ServiceOperations'
+        enabled: true
+      }
+    ]
+  }
+}
+
+param stream_analytics_job_name string = 'asa-${uniqueString(resourceGroup().id)}'
+resource stream_analytics_job 'Microsoft.StreamAnalytics/streamingjobs@2017-04-01-preview' = {
+  name: stream_analytics_job_name
+  location: location
+  properties: {
+    sku: {
+      name: 'Standard'
+    }
+  }
+}
+
+resource stream_analytics_job_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: diagnostic_settings_name
+  scope: stream_analytics_job
+  properties: {
+    workspaceId: log_analytics.id
+    logAnalyticsDestinationType: 'Dedicated'
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    logs: [
+      {
+        category: 'Execution'
+        enabled: true
+      }
+      {
+        category: 'Authoring'
         enabled: true
       }
     ]
