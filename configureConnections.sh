@@ -32,10 +32,15 @@ connection_string=$(echo "$connection_string" | tr -d '`"')
 echo "$connection_string"
 echo
 
+echo "Configure Iot-Hub Blob Connections"
+az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name blobRawMeasureData --endpoint-type azurestoragecontainer --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $connection_string --container-name iothubrawdata --batch-frequency 60 --chunk-size 100 --ff {iothub}/{partition}/{YYYY}/{MM}/{DD}/{HH}/{mm} --encoding json
+az iot hub route create -g $resource_group_name --hub-name $iot_hub_id --endpoint-name blobRawMeasureData --source-type DeviceMessages --route-name blobRawMeasureData --condition true
 
-# az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name blobRawMeasureData --endpoint-type azurestoragecontainer --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $connection_string --container-name iothubrawdata --batch-frequency 60 --chunk-size 100 --ff {iothub}/{partition}/{YYYY}/{MM}/{DD}/{HH}/{mm} --encoding json
-# az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name twinchanges2blob --endpoint-type azurestoragecontainer --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $connection_string --container-name iothubtwinchanges --batch-frequency 60 --chunk-size 100 --ff {iothub}/{YYYY}/{MM}/{DD}/{HH}/{mm}/{partition} --encoding json
+az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name twinchanges2blob --endpoint-type azurestoragecontainer --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $connection_string --container-name iothubtwinchanges --batch-frequency 60 --chunk-size 100 --ff {iothub}/{YYYY}/{MM}/{DD}/{HH}/{mm}/{partition} --encoding json
+az iot hub route create -g $resource_group_name --hub-name $iot_hub_id --endpoint-name twinchanges2blob --source-type digitaltwinchangeevents --route-name twinchanges2blob --condition true
+echo
 
+echo "Configure Iot-Hub EventHub Connections"
 # az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id
 eventhub_authorization_rule_name=$(az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id --query "[].name" --output tsv)
 eventhub_authorization_rule_name=$(echo "$eventhub_authorization_rule_name" | tr -d '\r')
@@ -69,6 +74,9 @@ echo "eventhub_iothub2asaenrichmessage_connection_string:" $eventhub_iothub2asad
 
 
 az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name asaenrichMessageDigitalLabRoute --endpoint-type eventhub --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $eventhub_iothub2asadigitallab_connection_string
+az iot hub route create -g $resource_group_name --hub-name $iot_hub_id --endpoint-name asaenrichMessageDigitalLabRoute --source-type DeviceMessages --route-name asaenrichMessageDigitalLabRoute
+# condition='"route = "digitallab"'
+
 
 echo
 
@@ -83,6 +91,7 @@ eventhub_iothub2asaenrichmessage_connection_string=$(echo "$eventhub_iothub2asae
 echo "eventhub_iothub2asaenrichmessage_connection_string:" $eventhub_iothub2asaenrichmessage_connection_string
 
 az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name asaEnrichMeasureData --endpoint-type eventhub --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $eventhub_iothub2asaenrichmessage_connection_string
+az iot hub route create -g $resource_group_name --hub-name $iot_hub_id --endpoint-name asaEnrichMeasureData --source-type DeviceMessages --route-name asaEnrichMeasureData
 
 # az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id --query "[].name" --output tsv
 
