@@ -29,5 +29,3 @@ app_settings="{\"IoTHubConnectionString\": $iot_hub_connection_string}"
 
 jq -n "$app_settings" > ./IoTDevice/appsettings.json
 cat ./IoTDevice/appsettings.json
-
-
