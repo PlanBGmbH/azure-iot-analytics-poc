@@ -17,7 +17,7 @@ location="westeurope"
 az deployment group create -f ./main.bicep -g $resource_group_name
 
 output=$(az deployment group create -f ./main.bicep -g $resource_group_name --query "properties.outputs");
-echo "$output"
+# echo "$output"
 echo
 
 iot_hub_id_output=$(echo "$output" | jq '.iothubId.value')
