@@ -168,7 +168,6 @@ resource event_hub_adedirectdigitallab_auth_rule 'Microsoft.EventHub/namespaces/
   }
 }
 
-
 param event_hub_aintestingdirect1016247_name string = 'aintestingdirect1016247'
 resource event_hub_aintestingdirect1016247 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
   name: concat(event_hub_namespace.name, '/', event_hub_aintestingdirect1016247_name)
@@ -178,6 +177,17 @@ resource event_hub_aintestingdirect1016247 'Microsoft.EventHub/namespaces/eventh
   }
 }
 output eventHubIdAintestingdirect1016247 string = event_hub_aintestingdirect1016247.id
+
+resource event_hub_aintestingdirect1016247_auth_rule 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2017-04-01' = {
+  name: concat( event_hub_aintestingdirect1016247.name, '/', event_hub_aintestingdirect1016247_name, '-policy')
+  properties: {
+    rights: [
+      'Send'
+      'Listen'
+    ]
+  }
+}
+
 
 param event_hub_asaenrich2routingapp_name string = 'asaenrich2routingapp'
 resource event_hub_asaenrich2routingapp 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
@@ -189,6 +199,17 @@ resource event_hub_asaenrich2routingapp 'Microsoft.EventHub/namespaces/eventhubs
 }
 output eventHubIdAsaenrich2routingapp string = event_hub_asaenrich2routingapp.id
 
+resource event_hub_asaenrich2routingapp_auth_rule 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2017-04-01' = {
+  name: concat( event_hub_asaenrich2routingapp.name, '/', event_hub_asaenrich2routingapp_name, '-policy')
+  properties: {
+    rights: [
+      'Send'
+      'Listen'
+    ]
+  }
+}
+
+
 param event_hub_iothub2asadigitallab_name string = 'iothub2asadigitallab'
 resource event_hub_iothub2asadigitallab 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
   name: concat(event_hub_namespace.name, '/', event_hub_iothub2asadigitallab_name)
@@ -199,6 +220,16 @@ resource event_hub_iothub2asadigitallab 'Microsoft.EventHub/namespaces/eventhubs
 }
 output eventHubIdIothub2asadigitallab string = event_hub_iothub2asadigitallab.id
 
+resource event_hub_iothub2asadigitallab_auth_rule 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2017-04-01' = {
+  name: concat( event_hub_iothub2asadigitallab.name, '/', event_hub_iothub2asadigitallab_name, '-policy')
+  properties: {
+    rights: [
+      'Send'
+      'Listen'
+    ]
+  }
+}
+
 param event_hub_iothub2asaenrichmessage_name string = 'iothub2asaenrichmessage'
 resource event_hub_iothub2asaenrichmessage 'Microsoft.EventHub/namespaces/eventhubs@2017-04-01' = {
   name: concat(event_hub_namespace.name, '/', event_hub_iothub2asaenrichmessage_name)
@@ -208,6 +239,7 @@ resource event_hub_iothub2asaenrichmessage 'Microsoft.EventHub/namespaces/eventh
   }
 }
 output eventHubIdIothub2asaenrichmessage string = event_hub_iothub2asaenrichmessage.id
+
 resource event_hub_iothub2asaenrichmessage_auth_rule 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2017-04-01' = {
   name: concat( event_hub_iothub2asaenrichmessage.name, '/', event_hub_iothub2asaenrichmessage_name, '-policy')
   properties: {
