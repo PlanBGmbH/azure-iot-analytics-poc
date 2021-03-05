@@ -7,6 +7,9 @@ event_hub_namespace_id=$5
 event_hub_id=$6
 event_hub_id_adedirectdigitallab=$7
 event_hub_id_aintestingdirect1016247=$8
+event_hub_id_asaenrich2routingapp=$9
+event_hub_id_iothub2asadigitallab=$10
+event_hub_id_iothub2asaenrichmessage=$11
 echo $resource_group_name
 echo $storage_account_id
 echo $iot_hub_id
@@ -14,7 +17,9 @@ echo $subscription_id
 echo $event_hub_namespace_id
 echo $event_hub_id
 echo $event_hub_id_adedirectdigitallab
-echo $event_hub_id_aintestingdirect1016247
+echo $event_hub_id_asaenrich2routingapp
+echo $event_hub_id_iothub2asadigitallab
+echo $event_hub_id_iothub2asaenrichmessage
 
 # az storage account show-connection-string  --resource-group $resource_group_name -n $storage_account_id
 
@@ -46,6 +51,34 @@ eventhub_authorization_rule_name_aintestingdirect1016247=$(az eventhubs eventhub
 eventhub_authorization_rule_name_aintestingdirect1016247=$(echo "$eventhub_authorization_rule_name_aintestingdirect1016247" | tr -d '\r')
 echo "eventhub_authorization_rule_name_aintestingdirect1016247:" $eventhub_authorization_rule_name_aintestingdirect1016247
 echo
+
+eventhub_authorization_rule_name_asaenrich2routingapp=$(az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id_asaenrich2routingapp --query "[].name" --output tsv)
+eventhub_authorization_rule_name_asaenrich2routingapp=$(echo "$eventhub_authorization_rule_name_asaenrich2routingapp" | tr -d '\r')
+echo "eventhub_authorization_rule_name_asaenrich2routingapp:" $eventhub_authorization_rule_name_asaenrich2routingapp
+echo
+
+eventhub_authorization_rule_name_iothub2asadigitallab=$(az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id_iothub2asadigitallab --query "[].name" --output tsv)
+eventhub_authorization_rule_name_iothub2asadigitallab=$(echo "$eventhub_authorization_rule_name_iothub2asadigitallab" | tr -d '\r')
+echo "eventhub_authorization_rule_name_iothub2asadigitallab:" $eventhub_authorization_rule_name_iothub2asadigitallab
+echo
+
+eventhub_authorization_rule_name_iothub2asaenrichmessage=$(az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id_iothub2asaenrichmessage --query "[].name" --output tsv)
+eventhub_authorization_rule_name_iothub2asaenrichmessage=$(echo "$eventhub_authorization_rule_name_iothub2asaenrichmessage" | tr -d '\r')
+echo "eventhub_authorization_rule_name_iothub2asaenrichmessage:" $eventhub_authorization_rule_name_iothub2asaenrichmessage
+echo
+
+eventhub_iothub2asaenrichmessage_connection_string=$(az eventhubs eventhub authorization-rule keys list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id_iothub2asaenrichmessage --name $eventhub_authorization_rule_name_iothub2asaenrichmessage --query "primaryConnectionString");
+echo "$eventhub_iothub2asaenrichmessage_connection_string"
+# echo
+
+# eventhub_iothub2asaenrichmessage_connection_string=$(echo "$eventhub_iothub2asaenrichmessage_connection_string" | tr -d '\r')
+eventhub_iothub2asaenrichmessage_connection_string=$(echo "$eventhub_iothub2asaenrichmessage_connection_string" | tr -d '`"')
+
+echo "eventhub_iothub2asaenrichmessage_connection_string:" $eventhub_iothub2asaenrichmessage_connection_string
+
+
+
+az iot hub routing-endpoint create --resource-group $resource_group_name --hub-name $iot_hub_id --endpoint-name E2 --endpoint-type eventhub --endpoint-resource-group $resource_group_name --endpoint-subscription-id $subscription_id --connection-string $eventhub_iothub2asaenrichmessage_connection_string
 
 # az eventhubs eventhub authorization-rule list --resource-group $resource_group_name --namespace-name $event_hub_namespace_id --eventhub-name $event_hub_id --query "[].name" --output tsv
 
