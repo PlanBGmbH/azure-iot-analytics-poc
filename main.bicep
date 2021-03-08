@@ -269,6 +269,11 @@ resource storage_account_blob_container_twinchanges 'Microsoft.Storage/storageAc
   name: '${storage_account.name}/default/${storage_account_blob_container_name_twinchanges}'
 }
 
+param storage_account_blob_container_name_asaenricheddata string = 'asaenricheddata'
+resource storage_account_blob_container_asaenricheddata 'Microsoft.Storage/storageAccounts/blobServices/containers@2020-08-01-preview' = {
+  name: '${storage_account.name}/default/${storage_account_blob_container_name_asaenricheddata}'
+}
+
 param iot_hub_name string = 'iot-${uniqueString(resourceGroup().id)}'
 resource iothub 'Microsoft.Devices/IotHubs@2020-04-01' = {
   name: iot_hub_name
@@ -353,23 +358,73 @@ resource iot_hub_diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-p
   }
 }
 
-resource stream_analytics_job_input 'Microsoft.StreamAnalytics/streamingjobs/inputs@2017-04-01-preview' = {
-  name: concat(stream_analytics_job.name, '/', 'iothubrouteDigiLab')
+// resource stream_analytics_job_output_blob_container_asaenricheddata 'Microsoft.StreamAnalytics/streamingjobs/outputs@2017-04-01-preview' = {
+//   name: concat(stream_analytics_job.name, '/', 'blobenrichedmeasuredata')
+//   properties: {
+//     datasource: {
+//       type: 'Microsoft.Storage/Blob'
+//       properties: {
+//         storageAccounts: [
+//           {
+//             accountName: storage_account.name
+//             accountKey: listKeys(storage_account.name,'2020-08-01-preview')
+//           }
+//         ]
+//         container: storage_account_blob_container_name_asaenricheddata
+//         pathPattern: '{businessPartnerId}/{date}/{time}'
+//         dateFormat: 'yyyy/MM/dd'
+//         timeFormat: 'HH'
+//       }
+//     }
+//     sizeWindow: 1000
+//     timeWindow:'00:05:00'
+//     serialization: {
+//       type: 'Json'
+//       properties: {
+//         encoding: 'UTF8'
+//       }
+//     }
+//   }
+// }
+
+resource stream_analytics_job_output_event_hub_asaenrich2routingapp 'Microsoft.StreamAnalytics/streamingjobs/outputs@2017-04-01-preview' = {
+  name: concat(stream_analytics_job.name, '/', storage_account_blob_container_name_rawdata)
   properties: {
-    type: 'Stream'
     datasource: {
-      type: 'Microsoft.Devices/IotHubs'
+      type: 'Microsoft.EventHub/EventHub'
       properties: {
-        iotHubNamespace: iothub.name
-        sharedAccessPolicyName: 'iothubowner'
+        eventHubName: replace(replace(event_hub_asaenrich2routingapp.name, first(split(event_hub_asaenrich2routingapp.name, '/')), ''), '/', '')
+        sharedAccessPolicyName: event_hub_asaenrich2routingapp_name
         sharedAccessPolicyKey: 'key'
-        endpoint: 'messages/events'
+        serviceBusNamespace: event_hub_namespace.name
       }
     }
     serialization: {
       type: 'Json'
-      properties:{
-        encoding:'UTF8'
+      properties: {
+        encoding: 'UTF8'
+      }
+    }
+  }
+}
+
+resource stream_analytics_job_input 'Microsoft.StreamAnalytics/streamingjobs/inputs@2017-04-01-preview' = {
+  name: concat(stream_analytics_job.name, '/', 'rawMeasureData')
+  properties: {
+    type: 'Stream'
+    datasource: {
+      type: 'Microsoft.EventHub/EventHub'
+      properties: {
+        eventHubName: replace(replace(event_hub_iothub2asaenrichmessage.name, first(split(event_hub_iothub2asaenrichmessage.name, '/')), ''), '/', '')
+        sharedAccessPolicyName: event_hub_iothub2asaenrichmessage_name
+        sharedAccessPolicyKey: 'key'
+        serviceBusNamespace: event_hub_namespace.name
+      }
+    }
+    serialization: {
+      type: 'Json'
+      properties: {
+        encoding: 'UTF8'
       }
     }
   }
